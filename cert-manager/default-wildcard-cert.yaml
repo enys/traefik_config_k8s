@@ -1,0 +1,11 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-default-cert
+spec:
+  dnsNames:
+  - '*.k8s.dev.linkurious.net'
+  issuerRef:
+    name: dns01-letsencrypt-staging
+    kind: ClusterIssuer
+  secretName: wildcard-default-cert
