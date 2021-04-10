@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: traefik-dashboard-cert
+  namespace: traefik
+spec:
+  secretName: traefik-dashboard-cert
+  issuerRef:
+    name: http-letsencrypt-staging
+    kind: ClusterIssuer
+  commonName: traefik.k8s.dev.linkurious.net
+  dnsNames:
+  - traefik.k8s.dev.linkurious.net
