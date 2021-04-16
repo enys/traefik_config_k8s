@@ -23,7 +23,33 @@ deployment:
   # Additional Pod labels (e.g. for filtering Pod by custom labels)
   podLabels: {}
   # Additional containers (e.g. for metric offloading sidecars)
-  additionalContainers: []
+  additionalContainers: 
+    - name: traefik-forward-auth
+      image: thomseddon/traefik-forward-auth:2
+      ports:
+      - containerPort: 4181
+        protocol: TCP
+      env:
+      - name: DOMAIN
+        value: "linkurio.us"
+      # INSECURE_COOKIE is required unless using https entrypoint
+      - name: INSECURE_COOKIE
+        value: "true"
+      - name: PROVIDERS_GOOGLE_CLIENT_ID
+        valueFrom:
+          secretKeyRef:
+            name: traefik-forward-auth-secrets
+            key: traefik-forward-auth-google-client-id
+      - name: PROVIDERS_GOOGLE_CLIENT_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: traefik-forward-auth-secrets
+            key: traefik-forward-auth-google-client-secret
+      - name: SECRET
+        valueFrom:
+          secretKeyRef:
+            name: traefik-forward-auth-secrets
+            key: traefik-forward-auth-secret
     # https://docs.datadoghq.com/developers/dogstatsd/unix_socket/?tab=host
     # - name: socat-proxy
     # image: alpine/socat:1.0.5
@@ -192,6 +218,8 @@ globalArguments:
 ## Use curly braces to pass values: `helm install --set="additionalArguments={--providers.kubernetesingress.ingressclass=traefik-internal,--log.level=DEBUG}"`
 additionalArguments:
   - "--providers.file.filename=/config/traefik-config.yaml"
+  - "--entryPoints.websecure.proxyProtocol.trustedIPs=127.0.0.1"
+  - "--entryPoints.websecure.forwardedHeaders.trustedIPs=127.0.0.1"
     #- "--api.insecure=true"
 
 # Environment variables to be passed to Traefik's binary
@@ -299,13 +327,16 @@ service:
   enabled: true
   type: LoadBalancer
   # Additional annotations (e.g. for cloud provider specific config)
-  annotations: {}
+  annotations:
+    service.beta.kubernetes.io/scw-loadbalancer-type: "lb-s"
+    service.beta.kubernetes.io/scw-loadbalancer-proxy-protocol-v2: "*"
   # Additional service labels (e.g. for filtering Service by custom labels)
   labels: {}
   # Additional entries here will be added to the service spec. Cannot contains
   # type, selector or ports entries.
-  spec: {}
+  spec:
     # externalTrafficPolicy: Cluster
+    externalTrafficPolicy: Local
     # loadBalancerIP: "1.2.3.4"
     # clusterIP: "2.3.4.5"
   loadBalancerSourceRanges: []
