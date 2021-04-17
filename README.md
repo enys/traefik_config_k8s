@@ -113,3 +113,13 @@ And create the forwardAuth middleware, that will delegate athentication to this 
 ```
 kubectl apply -f traefik/traefik-oauth-middleware.yaml
 ```
+
+# ProxyProtocol v2
+To allow services to determine the 'real' client IP, we need to activate Proxy protocol v2, on both the load balancer and the ingress.
+
+This is done via annotations of the the service in traefik's [chart-values](traefik/traefik-chart-values.yaml).
+This is often cloud provide specific, for scaleway: https://github.com/scaleway/scaleway-cloud-controller-manager/blob/master/docs/loadbalancer-annotations.md
+
+You also need to configure Traefik correctly with Proxy protocl v2: https://doc.traefik.io/traefik/routing/entrypoints/#proxyprotocol
+
+Some details on the following issue: https://github.com/traefik/traefik-helm-chart/issues/404
