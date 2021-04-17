@@ -106,7 +106,7 @@ We have selected to add the container as a sidecar to traefik. See [chart-values
 
 You will need to create the appropriate secrets:
 ```
-kubectl apply -f traefik/traefik-oauth-secret-private.yaml
+kubectl apply -f traefik/traefik-oauth-secret.yaml
 ```
 
 And create the forwardAuth middleware, that will delegate athentication to this new container:
