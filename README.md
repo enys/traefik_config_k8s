@@ -98,3 +98,18 @@ kubectl apply -f cert-manager/default-wildcard-cert.yaml
 kubectl cert-manager status certificate wildcard-default-cert
 kubectl describe certificate wildcard-default-cert
 ```
+# Oauth
+
+We will use https://github.com/thomseddon/traefik-forward-auth to provide basic oauth login in front of selected services
+
+We have selected to add the container as a sidecar to traefik. See [chart-values](traefik/traefik-chart-values.yaml).
+
+You will need to create the appropriate secrets:
+```
+kubectl apply -f traefik/traefik-oauth-secret-private.yaml
+```
+
+And create the forwardAuth middleware, that will delegate athentication to this new container:
+```
+kubectl apply -f traefik/traefik-oauth-middleware.yaml
+```
