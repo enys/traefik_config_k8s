@@ -98,3 +98,28 @@ kubectl apply -f cert-manager/default-wildcard-cert.yaml
 kubectl cert-manager status certificate wildcard-default-cert
 kubectl describe certificate wildcard-default-cert
 ```
+# Oauth
+
+We will use https://github.com/thomseddon/traefik-forward-auth to provide basic oauth login in front of selected services
+
+We have selected to add the container as a sidecar to traefik. See [chart-values](traefik/traefik-chart-values.yaml).
+
+You will need to create the appropriate secrets:
+```
+kubectl apply -f traefik/traefik-oauth-secret.yaml
+```
+
+And create the forwardAuth middleware, that will delegate athentication to this new container:
+```
+kubectl apply -f traefik/traefik-oauth-middleware.yaml
+```
+
+# ProxyProtocol v2
+To allow services to determine the 'real' client IP, we need to activate Proxy protocol v2, on both the load balancer and the ingress.
+
+This is done via annotations of the the service in traefik's [chart-values](traefik/traefik-chart-values.yaml).
+This is often cloud provide specific, for scaleway: https://github.com/scaleway/scaleway-cloud-controller-manager/blob/master/docs/loadbalancer-annotations.md
+
+You also need to configure Traefik correctly with Proxy protocl v2: https://doc.traefik.io/traefik/routing/entrypoints/#proxyprotocol
+
+Some details on the following issue: https://github.com/traefik/traefik-helm-chart/issues/404
