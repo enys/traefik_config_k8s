@@ -218,9 +218,12 @@ globalArguments:
 ## Use curly braces to pass values: `helm install --set="additionalArguments={--providers.kubernetesingress.ingressclass=traefik-internal,--log.level=DEBUG}"`
 additionalArguments:
   - "--providers.file.filename=/config/traefik-config.yaml"
+  - "--entryPoints.web.proxyProtocol.trustedIPs=127.0.0.1"
+  - "--entryPoints.web.forwardedHeaders.trustedIPs=127.0.0.1"
   - "--entryPoints.websecure.proxyProtocol.trustedIPs=127.0.0.1"
   - "--entryPoints.websecure.forwardedHeaders.trustedIPs=127.0.0.1"
   - "--entrypoints.websecure.http.middlewares=traefik-default-security-headers@kubernetescrd"
+  - "--metrics.prometheus=true"
     #- "--api.insecure=true"
 
 # Environment variables to be passed to Traefik's binary
@@ -422,13 +425,13 @@ serviceAccount:
 # Additional serviceAccount annotations (e.g. for oidc authentication)
 serviceAccountAnnotations: {}
 
-resources: {}
-  # requests:
-  #   cpu: "100m"
-  #   memory: "50Mi"
-  # limits:
-  #   cpu: "300m"
-  #   memory: "150Mi"
+resources:
+  requests:
+    cpu: "100m"
+    memory: "50Mi"
+  limits:
+    cpu: "300m"
+    memory: "150Mi"
 affinity: {}
 # # This example pod anti-affinity forces the scheduler to put traefik pods
 # # on nodes where no other traefik pods are scheduled.
